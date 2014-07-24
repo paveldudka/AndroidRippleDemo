@@ -3,19 +3,18 @@ package trickyandroid.com.rippletest;
 import android.app.Activity;
 import android.graphics.Outline;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Space;
 
 
 public class MainActivity extends Activity implements View.OnTouchListener {
 
     private ViewGroup buttonsContainer;
-    private Button activeButton = null;
+    private ViewGroup activeButton = null;
     private final int MAX_BUTTONS = 3;
 
     @Override
@@ -32,13 +31,12 @@ public class MainActivity extends Activity implements View.OnTouchListener {
 
         for (int i = 0; i < MAX_BUTTONS; i++) {
             ViewGroup buttonHost = (ViewGroup) getLayoutInflater().inflate(R.layout.circular_button_layout, buttonsContainer, false);
-            Button button = (Button) buttonHost.getChildAt(0);
-            button.setOutline(circularOutline);
-            button.setClipToOutline(true);
+            TextView button = (TextView) buttonHost.getChildAt(0);
+            buttonHost.setOutline(circularOutline);
 
             button.setText("Test " + i);
 
-            button.setOnTouchListener(this);
+            buttonHost.setOnTouchListener(this);
             buttonsContainer.addView(buttonHost);
 
             //Add margin between buttons manually
@@ -46,15 +44,15 @@ public class MainActivity extends Activity implements View.OnTouchListener {
                 buttonsContainer.addView(new Space(this), new ViewGroup.LayoutParams(buttonsSpacing, buttonSize));
             }
         }
-        selectButton((Button) ((ViewGroup) buttonsContainer.getChildAt(0)).getChildAt(0), false);
+        selectButton(((ViewGroup) buttonsContainer.getChildAt(0)), false);
     }
 
-    private void selectButton(Button button, boolean reveal) {
-        selectButton(button, reveal, button.getWidth(), button.getHeight());
+    private void selectButton(ViewGroup buttonHost, boolean reveal) {
+        selectButton(buttonHost, reveal, buttonHost.getWidth(), buttonHost.getHeight());
     }
 
-    private void selectButton(Button button, boolean reveal, int startX, int startY) {
-        if (button == activeButton) {
+    private void selectButton(ViewGroup buttonHost, boolean reveal, int startX, int startY) {
+        if (buttonHost == activeButton) {
             return;
         }
 
@@ -63,22 +61,30 @@ public class MainActivity extends Activity implements View.OnTouchListener {
             activeButton = null;
         }
 
-        activeButton = button;
+        activeButton = buttonHost;
         activeButton.setSelected(true);
 
+        View button = activeButton.getChildAt(0);
+
         if (reveal) {
-            ViewAnimationUtils.createCircularReveal(activeButton,
+            ViewAnimationUtils.createCircularReveal(button,
                     startX,
                     startY,
                     0,
-                    activeButton.getHeight()).start();
+                    button.getHeight()).start();
         }
     }
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-        if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-            selectButton((Button) view, true, (int) motionEvent.getX(), (int) motionEvent.getY());
+        switch (motionEvent.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                ((ViewGroup) view).getChildAt(0).getBackground().setHotspot(motionEvent.getX(), motionEvent.getY());
+                break;
+            case MotionEvent.ACTION_UP:
+                selectButton((ViewGroup) view, true, (int) motionEvent.getX(), (int) motionEvent.getY());
+                break;
+
         }
         return false;
     }

@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="@dimen/button_size"
     android:layout_height="@dimen/button_size"
-    android:background="@drawable/circular_button">
+    android:background="@drawable/circular_button"
+    android:stateListAnimator="@anim/button_elevation"
+    android:clickable="true"
+    >
 
-    <Button
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/circular_button_ripple_selector"
         android:textAppearance="?android:textAppearanceLarge"
         android:textColor="@color/button_text_selector"
-        android:stateListAnimator="@anim/button_elevation"/>
+        android:duplicateParentState="true"
+        android:gravity="center"
+        tools:text="Text"
+        tools:textColor="#000"
+        />
 
 </FrameLayout>
